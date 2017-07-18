@@ -3,11 +3,33 @@ body {
 }
 
 
+.container{
+    margin-top: 15px;
+}
+
 .bld {
     font-weight: bold;
 }
 
 .highlight {
-    background: orange;
     color: black;
+    padding: 0;
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+#text-title{
+     font-weight: 700;
+}
+
+.text-row {
+    padding: 0 5px 0 5px;
+}
+
+.text-p {
+    padding: 5px 0 5px 0;
+}
+
+.text-p-icon {
+    padding-right: 5px;
 }
