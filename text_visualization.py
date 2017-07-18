@@ -4,8 +4,6 @@ import numpy as np
 import pandas as pd
 import json
 import string
-import nltk
-from nltk.corpus import stopwords
 from sklearn.preprocessing import normalize
 from random import shuffle
 from collections import Counter
@@ -39,21 +37,41 @@ def index():
 
 @app.route("/word_count")
 def word_count():
-    df = pd.read_csv(os.path.join(base_dir, 'static', 'data', 'most_common_wc.txt'))
+    df = pd.read_csv(os.path.join(base_dir, 'static', 'data', 'wc_one_cat.csv'))
     df.columns = ['text', 'count']
     df['size'] = normalize(df['count'].reshape(1, -1))[0]*300
-    data = df.to_dict('records')
+    data = df.iloc[:70].to_dict('records')
     return jsonify(wc=data)
 
 
 @app.route("/shuffle_text")
 def shuffle_text():
-    df = pd.read_csv(os.path.join(base_dir, 'static', 'data', 'top10k.txt'), header=None, sep="|")
-    shuffled_idx = list(range(len(df)))
-    shuffle(shuffled_idx)
-    data = df.iloc[shuffled_idx][0].tolist()[:20]
-    return jsonify(st=data)
+    keyword = request.args.get('keyword')
+    color = request.args.get('color', default="black")
+    print(color)
+
+    df = pd.read_csv(os.path.join(base_dir, 'static', 'data', 'translated_turkey.csv'))
+
+    col_name = 'Clue_translation_en'
+    cat_col_name = 'Customer Clue_translation_en'
+    selected_cat = df[cat_col_name].unique()[0]
+    # wc_data = df[df[cat_col_name] == selected_cat][col_name]
+
+    if keyword:
+        idx = df[df[col_name].str.contains(keyword, case=False)].index.values
+    else:
+        idx = df.index.values
+
+    shuffle(idx)
+    if len(idx) > 10:
+        select_idx = idx[:10]
+    else:
+        select_idx = idx
+
+    data = df.iloc[select_idx][col_name].tolist()
+    return jsonify(st=data, kw=keyword, fc=color)
 
 
 if __name__ == '__main__':
     app.run()
+
